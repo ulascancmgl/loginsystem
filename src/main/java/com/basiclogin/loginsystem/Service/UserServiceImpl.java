@@ -13,8 +13,13 @@ import org.springframework.stereotype.Service;
 
 import com.basiclogin.loginsystem.Entity.Role;
 import com.basiclogin.loginsystem.Entity.User;
+import com.basiclogin.loginsystem.Entity.UserInfo;
+import com.basiclogin.loginsystem.Entity.UserInfoDto;
 import com.basiclogin.loginsystem.Entity.UserListDto;
+import com.basiclogin.loginsystem.Repository.UserInfoRepository;
 import com.basiclogin.loginsystem.Repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -22,11 +27,15 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserInfoRepository userInfoRepository;
 
     public UserServiceImpl(UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            UserInfoRepository userInfoRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userInfoRepository = userInfoRepository;
     }
 
     @Override
@@ -137,4 +146,24 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+    @Override
+    @Transactional
+    public void saveUserInfo(String userName, UserInfoDto userInfoDto) {
+        User user = userRepository.findByuserName(userName);
+        if (user == null) {
+            user = new User(userName);
+            userRepository.save(user);
+        }
+        if (!user.getUserInfos().isEmpty()) {
+            throw new IllegalStateException("User info already exists for user " + userName);
+        }
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUser(user);
+        userInfo.setFirstName(userInfoDto.getFirstName());
+        userInfo.setLastName(userInfoDto.getLastName());
+        userInfo.setBirthDate(userInfoDto.getBirthDate());
+        userInfo.setGender(userInfoDto.getGender());
+        userInfo.setAge();
+        userInfoRepository.save(userInfo);
+    }
 }

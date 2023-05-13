@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.basiclogin.loginsystem.Entity.JwtTokenUtil;
 import com.basiclogin.loginsystem.Entity.User;
+import com.basiclogin.loginsystem.Entity.UserInfoDto;
 import com.basiclogin.loginsystem.Entity.UserListDto;
 import com.basiclogin.loginsystem.Service.UserService;
 import com.basiclogin.loginsystem.Service.UserServiceImpl.UsernameNotChangedException;
@@ -125,6 +126,19 @@ public class Controller {
         String token = JwtTokenUtil.generateToken(user.getUserName());
         return ResponseEntity.ok(token);
 
+    }
+
+    @PostMapping("/{userName}/info")
+    public ResponseEntity<String> saveUserInfo(
+            @PathVariable String userName,
+            @RequestBody UserInfoDto userInfoDto) {
+        userService.saveUserInfo(userName, userInfoDto);
+        return ResponseEntity.ok("User info saved successfully");
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
 }
