@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -139,6 +140,24 @@ public class Controller {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @PatchMapping("/{userName}/info")
+    public ResponseEntity<String> patchUserInfo(
+            @PathVariable String userName,
+            @RequestBody UserInfoDto updates) {
+        userService.patchUserInfo(userName, updates);
+        return ResponseEntity.ok("User info updated successfully");
+    }
+
+    @GetMapping("/{userName}/info")
+    public ResponseEntity<UserInfoDto> getUserInfo(@PathVariable("userName") String userName) {
+        UserInfoDto userInfoDto = userService.getUserInfo(userName);
+        if (userInfoDto != null) {
+            return ResponseEntity.ok(userInfoDto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

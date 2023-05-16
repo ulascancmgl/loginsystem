@@ -166,4 +166,54 @@ public class UserServiceImpl implements UserService {
         userInfo.setAge();
         userInfoRepository.save(userInfo);
     }
+
+    @Override
+    @Transactional
+    public void patchUserInfo(String userName, UserInfoDto userInfoUpdates) {
+        User user = userRepository.findByuserName(userName);
+        if (user == null) {
+            throw new IllegalArgumentException("User " + userName + " not found");
+        }
+        if (user.getUserInfos().isEmpty()) {
+            throw new IllegalStateException("User info not found for user " + userName);
+        }
+        UserInfo userInfo = user.getUserInfos().get(0);
+
+        if (userInfoUpdates.getFirstName() != null) {
+            userInfo.setFirstName(userInfoUpdates.getFirstName());
+        }
+        if (userInfoUpdates.getLastName() != null) {
+            userInfo.setLastName(userInfoUpdates.getLastName());
+        }
+        if (userInfoUpdates.getBirthDate() != null) {
+            userInfo.setBirthDate(userInfoUpdates.getBirthDate());
+        }
+        if (userInfoUpdates.getGender() != null) {
+            userInfo.setGender(userInfoUpdates.getGender());
+        }
+
+        userInfo.setAge(); // yaş bilgisini güncelle
+        userInfoRepository.save(userInfo);
+    }
+
+    @Override
+    @Transactional
+    public UserInfoDto getUserInfo(String userName) {
+        User user = userRepository.findByuserName(userName);
+        if (user != null && !user.getUserInfos().isEmpty()) {
+            UserInfo userInfo = user.getUserInfos().get(0);
+            UserInfoDto userInfoDto = new UserInfoDto();
+            userInfoDto.setFirstName(userInfo.getFirstName());
+            userInfoDto.setLastName(userInfo.getLastName());
+            userInfoDto.setBirthDate(userInfo.getBirthDate());
+            userInfoDto.setGender(userInfo.getGender());
+            userInfoDto.setAge();
+
+            // Diğer UserInfo alanlarını ayarlayabilirsiniz
+
+            return userInfoDto;
+        } else {
+            return null;
+        }
+    }
 }

@@ -25,4 +25,8 @@ public interface UserService {
 
     public void saveUserInfo(String userName, UserInfoDto userInfoDto);
 
+    public void patchUserInfo(String userName, UserInfoDto userInfoUpdates);
+
+    public UserInfoDto getUserInfo(String userName);
+
 }
